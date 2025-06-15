@@ -18,3 +18,15 @@ pub fn getrole(args: &[ValkeyString]) -> ValkeyResult {
         None => Ok(ValkeyValue::Null),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_no_args() {
+        let test = getrole(&vec![]);
+        assert!(test.is_err());
+        assert!(matches!(test, Err(ValkeyError::WrongArity)));
+    }
+}

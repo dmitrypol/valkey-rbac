@@ -19,6 +19,6 @@ pub(crate) fn rbac(_ctx: &Context, args: Vec<ValkeyString>) -> ValkeyResult {
         "LIST" => list::list(&args[2..]),
         "ROLES" => roles::roles(&args[2..]),
         "SETROLE" => setrole::setrole(&args[2..]),
-        _ => Err(ValkeyError::Str("unknown valkey-rbac subcommand")),
+        _ => Err(ValkeyError::Str("invalid subcommand")),
     }
 }

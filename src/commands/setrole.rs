@@ -7,6 +7,19 @@ pub fn setrole(args: &[ValkeyString]) -> ValkeyResult {
     }
     let role = args[0].to_string();
     let rules = args[1].to_string();
+    // TODO - rules validation and appropriate error handling
     RBAC_ROLES.write().unwrap().insert(role, rules);
-    Ok(().into())
+    Ok("OK".into())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_no_args() {
+        let test = setrole(&vec![]);
+        assert!(test.is_err());
+        assert!(matches!(test, Err(ValkeyError::WrongArity)));
+    }
 }

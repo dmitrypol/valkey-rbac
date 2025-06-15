@@ -15,3 +15,15 @@ pub fn delrole(args: &[ValkeyString]) -> ValkeyResult {
     }
     Ok(ValkeyValue::Integer(output))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_no_args() {
+        let test = delrole(&vec![]);
+        assert!(test.is_err());
+        assert!(matches!(test, Err(ValkeyError::WrongArity)));
+    }
+}
