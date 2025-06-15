@@ -1,10 +1,14 @@
 mod commands;
 mod filters;
 
+use std::collections::HashMap;
+use std::sync::{LazyLock, RwLock};
 use valkey_module::alloc::ValkeyAlloc;
 use valkey_module::{Context, Status, ValkeyString, Version, valkey_module};
 
 static MIN_VALID_SERVER_VERSION: &[i64; 3] = &[7, 2, 0];
+static RBAC_ROLES: LazyLock<RwLock<HashMap<String, String>>> =
+    LazyLock::new(|| RwLock::new(HashMap::new()));
 
 pub(crate) fn valid_server_version(version: Version) -> bool {
     let server_version = &[
@@ -37,6 +41,7 @@ valkey_module! {
     preload: preload,
     init: init,
     commands: [
+        ["rbac",commands::rbac, "", 0, 0, 0],
     ],
     filters: [
     ]
