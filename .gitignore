@@ -1,0 +1,6 @@
+/target
+tmp/*
+.vscode/*
+.idea/*
+.DS_Store
+*.rdb

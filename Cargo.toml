@@ -1,0 +1,17 @@
+[package]
+name = "valkey-rbac"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+valkey-module = { version = "0.1.9" }
+
+[features]
+enable-system-alloc = ["valkey-module/enable-system-alloc"]
+min-redis-compatibility-version-7-2 = ["valkey-module/min-redis-compatibility-version-7-2"]
+min-valkey-compatibility-version-8-0 = ["valkey-module/min-valkey-compatibility-version-8-0"]
+use-redismodule-api = ["valkey-module/use-redismodule-api"]
+default = ["min-redis-compatibility-version-7-2", "use-redismodule-api"]
+
+[lib]
+crate-type = ["cdylib"]
