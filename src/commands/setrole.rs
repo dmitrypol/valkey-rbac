@@ -1,4 +1,4 @@
-use crate::RBAC_ROLES;
+use crate::{ACL_CATEGORIES, ACL_FLAGS, COMMAND_LIST, RBAC_ROLES};
 use valkey_module::{ValkeyError, ValkeyResult, ValkeyString};
 
 pub fn setrole(args: &[ValkeyString]) -> ValkeyResult {
@@ -6,10 +6,63 @@ pub fn setrole(args: &[ValkeyString]) -> ValkeyResult {
         return Err(ValkeyError::WrongArity);
     }
     let role = args[0].to_string();
-    let rules = args[1].to_string();
-    // TODO - rules validation and appropriate error handling
-    RBAC_ROLES.write().unwrap().insert(role, rules);
-    Ok("OK".into())
+    let mut acl_rules_vec = Vec::new();
+    for arg in args.iter().skip(1) {
+        acl_rules_vec.push(arg.to_string());
+    }
+    let acl_rules = acl_rules_vec.join(" ");
+    match validate_acl_string(acl_rules.clone()) {
+        Ok(_) => {
+            RBAC_ROLES.write().unwrap().insert(role, acl_rules);
+            Ok("OK".into())
+        }
+        Err(err) => {
+            return Err(ValkeyError::String(err));
+        }
+    }
+}
+
+fn validate_acl_string(acl_rules: String) -> Result<(), String> {
+    for token in acl_rules.split_whitespace() {
+        if !is_valid_acl_token(token) {
+            return Err(format!("Invalid ACL rule: {}", token));
+        }
+    }
+    Ok(())
+}
+
+fn is_valid_acl_token(token: &str) -> bool {
+    // "+GET -@dangerous ~cache:* reset -SET -flushdb -@admin +@read -@write resetkeys resetpass resetchannels allcommands nochannels";
+    let token = token.trim().to_ascii_lowercase();
+    if ACL_FLAGS.contains(&token.as_str()) {
+        return true;
+    }
+    if token.starts_with('+') || token.starts_with('-') {
+        let cmd_or_cat = &token[1..];
+        if cmd_or_cat.is_empty() {
+            return false; // Empty command or category is invalid
+        }
+        if cmd_or_cat.starts_with('@') {
+            // Category
+            return ACL_CATEGORIES
+                .read()
+                .unwrap()
+                .contains(&cmd_or_cat[1..].to_string());
+        } else {
+            // Command
+            return COMMAND_LIST
+                .read()
+                .unwrap()
+                .contains(&cmd_or_cat.to_string());
+        }
+    } else if token.starts_with('~') {
+        // key pattern
+        return true;
+    } else if token.starts_with('&') {
+        // channel pattern
+        return true;
+    }
+    false
 }
 
 #[cfg(test)]
