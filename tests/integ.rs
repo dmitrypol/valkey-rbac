@@ -51,6 +51,7 @@ fn test_rbac() -> Result<()> {
         .arg(&["setrole", "rolea", "-invalid-cmd"])
         .query(&mut con);
     assert!(test.is_err());
+    // TODO update role with attached user and verify user is updated
 
     // list / roles
     let test: Vec<String> = redis::cmd("rbac").arg(&["list"]).query(&mut con)?;

@@ -1,4 +1,4 @@
-use crate::{ACL_CATEGORIES, COMMAND_LIST, MIN_VALID_SERVER_VERSION};
+use crate::{ACL_CATEGORIES, COMMAND_LIST, MIN_VALID_SERVER_VERSION, RBAC_USER_ROLE_MAP};
 use valkey_module::{Context, ValkeyValue, Version};
 
 pub(crate) fn valid_server_version(version: Version) -> bool {
@@ -8,6 +8,18 @@ pub(crate) fn valid_server_version(version: Version) -> bool {
         version.patch.into(),
     ];
     server_version >= MIN_VALID_SERVER_VERSION
+}
+
+// loop through RBAC_USER_ROLE_MAP and return a vector of users for the given role
+pub(crate) fn get_users_for_role(role: String) -> Vec<String> {
+    let mut output = Vec::new();
+    let guard = RBAC_USER_ROLE_MAP.read().unwrap();
+    for (user, user_role) in guard.iter() {
+        if user_role == &role {
+            output.push(user.clone());
+        }
+    }
+    output
 }
 
 // Get ACL categories from the server and store them in ACL_CATEGORIES

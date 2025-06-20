@@ -25,14 +25,14 @@ pub(crate) fn attach(ctx: &Context, args: &[ValkeyString]) -> ValkeyResult {
         .insert(user.clone(), role.clone());
     // get ACL rules for the role
     let role_acl_rules: Vec<&str> = guard.get(&role).unwrap().split_whitespace().collect();
+    acl_setuser(ctx, user, role_acl_rules)
+}
+
+pub(crate) fn acl_setuser(ctx: &Context, user: String, role_acl_rules: Vec<&str>) -> ValkeyResult {
     // add "setuser" command and user to args for acl setuser command
     let mut acl_setuser_args = role_acl_rules;
     acl_setuser_args.insert(0, "setuser");
     acl_setuser_args.insert(1, user.as_str());
-    // call ACL SETUSER to apply role's ACL rules to the user
-    let acl_setuser = ctx.call("acl", &acl_setuser_args[..]);
-    match acl_setuser {
-        Ok(tmp) => Ok(tmp),
-        Err(err) => Err(err),
-    }
+    // call ACL SETUSER to apply role's ACL rules to the user and return the result
+    ctx.call("acl", &acl_setuser_args[..])
 }

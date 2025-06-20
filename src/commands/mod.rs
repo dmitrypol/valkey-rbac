@@ -20,7 +20,7 @@ pub(crate) fn rbac(ctx: &Context, args: Vec<ValkeyString>) -> ValkeyResult {
         "GETROLE" => getrole::getrole(&args[2..]),
         "LIST" => list::list(&args[2..]),
         "ROLES" => roles::roles(&args[2..]),
-        "SETROLE" => setrole::setrole(&args[2..]),
+        "SETROLE" => setrole::setrole(ctx, &args[2..]),
         "ATTACH" => attach::attach(ctx, &args[2..]),
         "DETACH" => detach::detach(&args[2..]),
         _ => Err(ValkeyError::Str("invalid subcommand")),
