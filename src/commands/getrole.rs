@@ -2,12 +2,13 @@ use crate::RBAC_ROLES;
 use std::collections::BTreeMap;
 use valkey_module::{ValkeyError, ValkeyResult, ValkeyString, ValkeyValue};
 
-pub fn getrole(args: &[ValkeyString]) -> ValkeyResult {
+/// get role by name, return its rules
+pub(crate) fn getrole(args: &[ValkeyString]) -> ValkeyResult {
     if args.len() < 1 {
         return Err(ValkeyError::WrongArity);
     }
     let role = args[0].to_string();
-    let guard = RBAC_ROLES.write().unwrap();
+    let guard = RBAC_ROLES.write()?;
     let mut output = BTreeMap::new();
     match guard.get(&role) {
         Some(tmp) => {

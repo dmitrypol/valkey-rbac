@@ -1,7 +1,8 @@
 use crate::{ACL_CATEGORIES, ACL_FLAGS, COMMAND_LIST, RBAC_ROLES};
 use valkey_module::{ValkeyError, ValkeyResult, ValkeyString};
 
-pub fn setrole(args: &[ValkeyString]) -> ValkeyResult {
+/// validates rules to follow ACL syntax and creates or updates RBAC_ROLES map
+pub(crate) fn setrole(args: &[ValkeyString]) -> ValkeyResult {
     if args.len() < 2 {
         return Err(ValkeyError::WrongArity);
     }
@@ -13,12 +14,11 @@ pub fn setrole(args: &[ValkeyString]) -> ValkeyResult {
     let acl_rules = acl_rules_vec.join(" ");
     match validate_acl_string(acl_rules.clone()) {
         Ok(_) => {
-            RBAC_ROLES.write().unwrap().insert(role, acl_rules);
+            RBAC_ROLES.write()?.insert(role, acl_rules);
+            // TODO apply rules to the users attached to this role
             Ok("OK".into())
         }
-        Err(err) => {
-            return Err(ValkeyError::String(err));
-        }
+        Err(err) => Err(ValkeyError::String(err)),
     }
 }
 

@@ -1,13 +1,15 @@
 use valkey_module::{Context, ValkeyError, ValkeyResult, ValkeyString};
 
+mod attach;
 mod delrole;
+mod detach;
 mod getrole;
 mod list;
 mod roles;
 mod setrole;
 
 /// main rbac command handler
-pub(crate) fn rbac(_ctx: &Context, args: Vec<ValkeyString>) -> ValkeyResult {
+pub(crate) fn rbac(ctx: &Context, args: Vec<ValkeyString>) -> ValkeyResult {
     if args.len() < 2 {
         return Err(ValkeyError::WrongArity);
     }
@@ -19,6 +21,8 @@ pub(crate) fn rbac(_ctx: &Context, args: Vec<ValkeyString>) -> ValkeyResult {
         "LIST" => list::list(&args[2..]),
         "ROLES" => roles::roles(&args[2..]),
         "SETROLE" => setrole::setrole(&args[2..]),
+        "ATTACH" => attach::attach(ctx, &args[2..]),
+        "DETACH" => detach::detach(&args[2..]),
         _ => Err(ValkeyError::Str("invalid subcommand")),
     }
 }

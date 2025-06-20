@@ -78,6 +78,39 @@ fn test_rbac() -> Result<()> {
     let test: Result<String, RedisError> = redis::cmd("rbac").arg(&["getrole"]).query(&mut con);
     assert!(test.is_err());
 
+    // attach
+    let test: Result<String, RedisError> = redis::cmd("rbac")
+        .arg(&["attach", "invalid-user", "rolea"])
+        .query(&mut con);
+    assert!(test.is_err());
+    // create a user
+    let _: Result<String, RedisError> =
+        redis::cmd("acl").arg(&["setuser", "user1"]).query(&mut con);
+    let test: Result<String, RedisError> = redis::cmd("rbac")
+        .arg(&["attach", "user1", "invalid-role"])
+        .query(&mut con);
+    assert!(test.is_err());
+    let test: String = redis::cmd("rbac")
+        .arg(&["attach", "user1", "rolea"])
+        .query(&mut con)?;
+    assert_eq!(test, "OK".to_string());
+    // TODO check if user1 has rolea permissions, acl getuser user1
+
+    // detach
+    let test: Result<String, RedisError> = redis::cmd("rbac")
+        .arg(&["detach", "invalid-user", "rolea"])
+        .query(&mut con);
+    assert!(test.is_err());
+    let test: Result<String, RedisError> = redis::cmd("rbac")
+        .arg(&["attach", "user1", "invalid-role"])
+        .query(&mut con);
+    assert!(test.is_err());
+    let test: String = redis::cmd("rbac")
+        .arg(&["detach", "user1", "rolea"])
+        .query(&mut con)?;
+    assert_eq!(test, "OK".to_string());
+    // TODO check if user1 still retains rolea permissions, acl getuser user1
+
     // delrole
     let test: i8 = redis::cmd("rbac")
         .arg(&["delrole", "rolea", "roleb", "invalid"])
@@ -89,6 +122,7 @@ fn test_rbac() -> Result<()> {
     assert_eq!(test.len(), 0);
     let test: Vec<String> = redis::cmd("rbac").arg(&["list"]).query(&mut con)?;
     assert_eq!(test.len(), 0);
+    // TODO check if user1 still retains rolea permissions, acl getuser user1
 
     Ok(())
 }
