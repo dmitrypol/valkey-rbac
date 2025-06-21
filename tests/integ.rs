@@ -18,6 +18,7 @@ fn test_rbac() -> anyhow::Result<()> {
     let _ = test_list_roles(&mut con)?;
     let _ = test_getrole(&mut con)?;
     let _ = test_attach(&mut con)?;
+    let _ = test_save_load(&mut con)?;
     let _ = test_detach(&mut con)?;
     let _ = test_delrole(&mut con)?;
     Ok(())
@@ -113,6 +114,14 @@ fn test_attach(mut con: &mut Connection) -> anyhow::Result<()> {
         .query(&mut con)?;
     assert_eq!(test, "OK".to_string());
     // TODO check if user1 has rolea permissions, acl getuser user1
+    Ok(())
+}
+
+fn test_save_load(mut con: &mut Connection) -> anyhow::Result<()> {
+    let test: String = redis::cmd("rbac").arg(&["save"]).query(&mut con)?;
+    assert_eq!(test, "OK".to_string());
+    let test: String = redis::cmd("rbac").arg(&["load"]).query(&mut con)?;
+    assert_eq!(test, "OK".to_string());
     Ok(())
 }
 

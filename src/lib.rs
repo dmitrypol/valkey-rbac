@@ -6,9 +6,16 @@ use crate::utils::*;
 use std::collections::HashMap;
 use std::sync::{LazyLock, RwLock};
 use valkey_module::alloc::ValkeyAlloc;
-use valkey_module::{Context, Status, ValkeyString, valkey_module};
+use valkey_module::configuration::ConfigurationFlags;
+use valkey_module::{Context, Status, ValkeyGILGuard, ValkeyString, valkey_module};
 
 static MIN_VALID_SERVER_VERSION: &[i64; 3] = &[7, 2, 0];
+// TODO - combine data structures
+#[derive(serde::Serialize, serde::Deserialize)]
+struct RbacStore {
+    roles: HashMap<String, String>,
+    user_role_map: HashMap<String, String>,
+}
 // TODO should RBAC_ROLES be HashMap<String, String>, HashMap<String, Vec<String>> or HashMap<String, BTreeSet<String>> (to enforce uniqueness)?
 static RBAC_ROLES: LazyLock<RwLock<HashMap<String, String>>> =
     LazyLock::new(|| RwLock::new(HashMap::new()));
@@ -25,6 +32,8 @@ static ACL_FLAGS: [&str; 7] = [
     "resetchannels",
     "reset",
 ];
+static RBACFILE: LazyLock<ValkeyGILGuard<String>> =
+    LazyLock::new(|| ValkeyGILGuard::new("".to_string()));
 
 fn preload(ctx: &Context, _args: &[ValkeyString]) -> Status {
     let ver = ctx.get_server_version().expect("can't get_server_version");
@@ -54,4 +63,14 @@ valkey_module! {
     ],
     filters: [
     ]
+    configurations: [
+        i64: [],
+        string: [
+            ["rbacfile", &*RBACFILE, "rbac.json", ConfigurationFlags::DEFAULT, None],
+        ],
+        bool: [],
+        enum: [],
+        module_args_as_configuration: true,
+    ]
+
 }
