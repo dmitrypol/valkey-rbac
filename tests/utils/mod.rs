@@ -11,7 +11,6 @@ pub(crate) struct ChildGuard {
 }
 
 impl ChildGuard {
-    #[allow(dead_code)]
     pub(crate) fn new(name: &'static str, child: std::process::Child) -> Self {
         ChildGuard { name, child }
     }
@@ -27,7 +26,6 @@ impl Drop for ChildGuard {
         }
     }
 }
-#[allow(dead_code)]
 pub(crate) fn start_server() -> anyhow::Result<ChildGuard> {
     let module_path = get_module_path()?;
     let args = &[
