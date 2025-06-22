@@ -1,5 +1,6 @@
 mod commands;
 mod filters;
+mod handlers;
 mod utils;
 
 use crate::filters::acl_setuser_filter;
@@ -51,6 +52,7 @@ fn preload(ctx: &Context, _args: &[ValkeyString]) -> Status {
 fn init(ctx: &Context, _args: &[ValkeyString]) -> Status {
     get_acl_categories(ctx);
     get_command_list(ctx);
+    let _ = commands::load::load(ctx);
     Status::Ok
 }
 
@@ -63,7 +65,7 @@ valkey_module! {
     init: init,
     commands: [
         ["rbac",commands::rbac, "", 0, 0, 0],
-        ["rbac_filter",filters::rbac_filter, "", 0, 0, 0],
+        ["rbac_filter",filters::rbac_filter_cmd, "", 0, 0, 0],
     ],
     filters: [
         [acl_setuser_filter, VALKEYMODULE_CMDFILTER_NOSELF],

@@ -16,5 +16,6 @@ pub(crate) fn save(ctx: &Context) -> ValkeyResult {
     let path = config_get_rbacfile(ctx);
     let mut file = File::create(path)?;
     file.write_all(json.as_bytes())?;
+    ctx.log_notice("saved RBAC to file");
     Ok("OK".into())
 }

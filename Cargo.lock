@@ -629,6 +629,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_syn"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e0ca8adcbd02c69d24859f7f0c54ede988e4509c8767c8a3185ec0eb158281c"
+dependencies = [
+ "bitflags 1.3.2",
+ "proc-macro2",
+ "serde",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "sha1_smol"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -792,6 +804,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "valkey-module-macros"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a5017b4ecb384e2937d66f375571c9b8cbbdee1a73a1fcd281e542041d807b76"
+dependencies = [
+ "proc-macro2",
+ "quote 1.0.40",
+ "serde",
+ "serde_syn",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "valkey-module-macros-internals"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -808,11 +833,13 @@ name = "valkey-rbac"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "linkme",
  "paste",
  "redis",
  "serde",
  "serde_json",
  "valkey-module",
+ "valkey-module-macros",
 ]
 
 [[package]]

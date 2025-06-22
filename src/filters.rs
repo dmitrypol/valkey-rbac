@@ -25,15 +25,18 @@ pub(crate) fn acl_setuser_filter(ctx: *mut RedisModuleCommandFilterCtx) {
         // if so, do not allow the command to proceed
         // TODO - only prevent updating ACL permissions, allow password and status
         let all_args = cf_ctx.get_all_args_wo_cmd();
-        log_notice(&format!("user attached to role - {:?}", all_args));
+        log_notice(&format!(
+            "cannot update user as it is attached to role - {:?}",
+            all_args
+        ));
         cf_ctx.arg_replace(0, "rbac_filter");
     }
 }
 
 // TODO - find a better way to stop command execution from filter
 // command called from filter restrict updating user if attached to a role
-pub(crate) fn rbac_filter(_ctx: &Context, _args: Vec<ValkeyString>) -> ValkeyResult {
-    log_notice(&format!("rbac_filter"));
+pub(crate) fn rbac_filter_cmd(_ctx: &Context, _args: Vec<ValkeyString>) -> ValkeyResult {
+    log_notice(&format!("rbac_filter_cmd"));
     Err(ValkeyError::Str(
         "user is attached to a role, cannot update ACL permissions",
     ))

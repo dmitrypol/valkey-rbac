@@ -17,5 +17,6 @@ pub(crate) fn load(ctx: &Context) -> ValkeyResult {
     *roles = parsed.roles;
     let mut user_role_map = RBAC_USER_ROLE_MAP.write().unwrap();
     *user_role_map = parsed.user_role_map;
+    ctx.log_notice("load RBAC from file");
     Ok("OK".into())
 }

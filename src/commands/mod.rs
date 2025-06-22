@@ -6,9 +6,9 @@ mod detach;
 mod getrole;
 mod help;
 mod list;
-mod load;
+pub(crate) mod load;
 mod roles;
-mod save;
+pub(crate) mod save;
 mod setrole;
 
 /// main rbac command handler
@@ -63,4 +63,13 @@ pub(crate) fn config_get_rbacfile(ctx: &Context) -> String {
     };
     let output = format!("{}/{}", dir, rbacfile);
     output
+}
+
+pub(crate) fn acl_setuser(ctx: &Context, user: String, role_acl_rules: Vec<&str>) -> ValkeyResult {
+    // add "setuser" command and user to args for acl setuser command
+    let mut acl_setuser_args = role_acl_rules;
+    acl_setuser_args.insert(0, "setuser");
+    acl_setuser_args.insert(1, user.as_str());
+    // call ACL SETUSER to apply role's ACL rules to the user and return the result
+    ctx.call("acl", &acl_setuser_args[..])
 }

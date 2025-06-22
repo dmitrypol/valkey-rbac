@@ -87,7 +87,10 @@ fn test_getrole(mut con: &mut Connection) -> anyhow::Result<()> {
     let test: Vec<String> = redis::cmd("rbac")
         .arg(&["getrole", "rolea"])
         .query(&mut con)?;
-    assert_eq!(test, vec!["rolea", "allkeys allcommands allchannels"]);
+    assert_eq!(
+        test,
+        vec!["rules", "allkeys allcommands allchannels", "users", "user1"]
+    );
     let test: Vec<String> = redis::cmd("rbac")
         .arg(&["getrole", "invalid"])
         .query(&mut con)?;

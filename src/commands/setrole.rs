@@ -1,6 +1,5 @@
-use crate::commands::attach;
 use crate::utils::get_users_for_role;
-use crate::{ACL_CATEGORIES, ACL_FLAGS, COMMAND_LIST, RBAC_ROLES};
+use crate::{ACL_CATEGORIES, ACL_FLAGS, COMMAND_LIST, RBAC_ROLES, commands};
 use valkey_module::{Context, ValkeyError, ValkeyResult, ValkeyString};
 
 /// validates rules to follow ACL syntax and creates or updates RBAC_ROLES map
@@ -23,7 +22,7 @@ pub(crate) fn setrole(ctx: &Context, args: &[ValkeyString]) -> ValkeyResult {
             // apply rules to the users attached to this role
             let users = get_users_for_role(role);
             for user in users {
-                let _ = attach::acl_setuser(ctx, user.clone(), acl_rules_vec.clone());
+                let _ = commands::acl_setuser(ctx, user.clone(), acl_rules_vec.clone());
             }
             Ok("OK".into())
         }
