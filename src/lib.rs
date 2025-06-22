@@ -2,12 +2,15 @@ mod commands;
 mod filters;
 mod utils;
 
+use crate::filters::acl_setuser_filter;
 use crate::utils::*;
 use std::collections::HashMap;
 use std::sync::{LazyLock, RwLock};
 use valkey_module::alloc::ValkeyAlloc;
 use valkey_module::configuration::ConfigurationFlags;
-use valkey_module::{Context, Status, ValkeyGILGuard, ValkeyString, valkey_module};
+use valkey_module::{
+    Context, Status, VALKEYMODULE_CMDFILTER_NOSELF, ValkeyGILGuard, ValkeyString, valkey_module,
+};
 
 static MIN_VALID_SERVER_VERSION: &[i64; 3] = &[7, 2, 0];
 // TODO - combine data structures
@@ -60,8 +63,10 @@ valkey_module! {
     init: init,
     commands: [
         ["rbac",commands::rbac, "", 0, 0, 0],
+        ["rbac_filter",filters::rbac_filter, "", 0, 0, 0],
     ],
     filters: [
+        [acl_setuser_filter, VALKEYMODULE_CMDFILTER_NOSELF],
     ]
     configurations: [
         i64: [],
