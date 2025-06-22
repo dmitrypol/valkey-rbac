@@ -4,6 +4,7 @@ mod attach;
 mod delrole;
 mod detach;
 mod getrole;
+mod help;
 mod list;
 mod load;
 mod roles;
@@ -27,6 +28,7 @@ pub(crate) fn rbac(ctx: &Context, args: Vec<ValkeyString>) -> ValkeyResult {
         "DETACH" => detach::detach(&args[2..]),
         "SAVE" => save::save(ctx),
         "LOAD" => load::load(ctx),
+        "HELP" => help::help(),
         _ => Err(ValkeyError::Str("invalid subcommand")),
     }
 }
